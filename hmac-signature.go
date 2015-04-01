@@ -5,6 +5,7 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"flag"
+	"fmt"
 	"net/url"
 	"os"
 	"strconv"
@@ -16,7 +17,7 @@ var (
 	keyFlag    = flag.String("key", "", "Key to sign the request.")
 	nonceFlag  = flag.String("nonce", "", "Optional nonce sign the request.")
 	urlFlag    = flag.String("url", "", "Request URL.")
-	paramsFlag = flag.String("params", "", "Request Params")
+	paramsFlag = flag.String("params", "", `Request Params. Example: "a=1 b=2"`)
 )
 
 func paramsToString() string {
@@ -36,8 +37,7 @@ func main() {
 	flag.Parse()
 
 	if (*keyFlag) == "" || (*urlFlag) == "" {
-		flag.PrintDefaults()
-		os.Exit(1)
+		flag.Usage()
 	}
 
 	// 1. Create a string variable using the url without params
@@ -69,4 +69,19 @@ func main() {
 	println("")
 	println("Signature:", digestInBase64)
 	println("Nonce:", *nonceFlag)
+}
+
+func init() {
+	flag.Usage = func() {
+		cmd := os.Args[0]
+		if len(cmd) > 50 {
+			cmd = "go run hmac-signature.go"
+		}
+
+		fmt.Fprintf(os.Stderr, "Usage of `%s`:\n", cmd)
+		flag.PrintDefaults()
+		fmt.Fprintf(os.Stderr, "\nExample: %s -key=\"key\" -url=\"example.com/path\" -nonce=\"123\" -params=\"c=3 b=2 a=1\"\n", cmd)
+
+		os.Exit(0)
+	}
 }
