@@ -42,7 +42,7 @@ if the `nonce` is not provided, one is generated automatically:
 
 ## Algorithm
 
-You can follow the code and comments [here](https://github.com/dcu/hmac-signature/blob/acaf4413767b5980fd5e7f4a57a87fc12cb3085e/hmac-signature.go#L43)
+You can follow the code and comments [here](https://github.com/dcu/hmac-signature/blob/8a75ba10016b0ebd763f826f90f67747dbcb07a1/hmac-signature.go#L44)
 
 
 
