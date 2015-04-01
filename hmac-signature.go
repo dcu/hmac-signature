@@ -16,6 +16,7 @@ import (
 var (
 	keyFlag    = flag.String("key", "", "Key to sign the request.")
 	nonceFlag  = flag.String("nonce", "", "Optional nonce sign the request.")
+	methodFlag = flag.String("http_method", "", "Request http method.")
 	urlFlag    = flag.String("url", "", "Request URL.")
 	paramsFlag = flag.String("params", "", `Request Params. Example: "a=1 b=2"`)
 )
@@ -40,30 +41,32 @@ func main() {
 		flag.Usage()
 	}
 
-	// 1. Create a string variable using the url without params
-	url := *urlFlag
-	println("URL:", url)
+	//  Create a string variable using the url without params
+	println("URL:", *urlFlag)
 
-	// 2. Sort the list of parameters in case-sensitive order and convert them to URL format
+	// Create a string variable with the HTTP method in upper case (GET, POST)
+	println("Method:", *methodFlag)
+
+	// Sort the list of parameters in case-sensitive order and convert them to URL format (both key and value should be URL-encoded)
 	sortedParams := paramsToString()
 	println("Params:", sortedParams)
 
-	// 3. Generate a unique nonce (number once):
+	// Generate a unique nonce (number once):
 	if len(*nonceFlag) == 0 {
 		*nonceFlag = strconv.FormatInt(time.Now().UnixNano(), 10)
 	}
 	println("Nonce:", *nonceFlag)
 
-	// 4. Join nonce, url and params_in_url_format together:
-	data := *nonceFlag + url + sortedParams
+	// Join http_method, nonce, url and params_in_url_format together with the | character:
+	data := strings.Join([]string{*nonceFlag, strings.ToUpper(*methodFlag), *urlFlag, sortedParams}, "|")
 	println("Data:", data)
 
-	// 5. Hash the resulting data using HMAC-SHA256, using your app_signing_key as the key:
+	// Hash the resulting data using HMAC-SHA256, using your app_signing_key as the key
 	mac := hmac.New(sha256.New, []byte(*keyFlag))
 	mac.Write([]byte(data))
 	digest := mac.Sum(nil)
 
-	// 6. Encode in base64 the digest:
+	// Encode in base64 the digest:
 	digestInBase64 := base64.StdEncoding.EncodeToString(digest)
 
 	println("")
@@ -80,7 +83,7 @@ func init() {
 
 		fmt.Fprintf(os.Stderr, "Usage of `%s`:\n", cmd)
 		flag.PrintDefaults()
-		fmt.Fprintf(os.Stderr, "\nExample: %s -key=\"key\" -url=\"example.com/path\" -nonce=\"123\" -params=\"c=3 b=2 a=1\"\n", cmd)
+		fmt.Fprintf(os.Stderr, "\nExample: %s -key=\"key\" -http_method=\"get\" -url=\"example.com/path\" -nonce=\"123\" -params=\"c=3 b=2 a=1\"\n", cmd)
 
 		os.Exit(0)
 	}
