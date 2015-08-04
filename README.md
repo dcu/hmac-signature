@@ -2,6 +2,22 @@
 
 HMAC Signature example
 
+## Configuring `go`
+
+Install `go` runtime. On Mac type:
+
+	brew install go
+
+On Ubuntu/Debian type:
+
+	sudo apt-get install golang
+
+Set the `$GOPATH`:
+
+	export GOPATH=~/GO
+	mkdir -p $GOPATH
+	export PATH=$GOPATH/bin:$PATH
+
 ## Installation
 
 ### Using `go get`
